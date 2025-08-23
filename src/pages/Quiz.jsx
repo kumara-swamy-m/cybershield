@@ -33,15 +33,18 @@ export default function Quiz() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center py-10 px-4">
-      <h2 className="text-4xl md:text-5xl font-extrabold mb-10 text-center text-green-400 drop-shadow-lg">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex flex-col items-center py-10 px-4 relative overflow-hidden">
+      {/* subtle animated background grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] animate-[pulse_6s_ease-in-out_infinite]"></div>
+
+      <h2 className="text-4xl md:text-5xl font-extrabold mb-10 text-center text-cyan-300 drop-shadow-lg relative z-10">
         🕹 Gamified Cyber Quiz
       </h2>
 
       {!completed ? (
-        <div className="w-full max-w-3xl">
-          <div className="bg-gray-800 p-8 rounded-3xl shadow-2xl border border-green-500 hover:shadow-green-400/50 transition-shadow duration-300">
-            <h3 className="text-2xl md:text-3xl font-semibold mb-6 text-green-300">
+        <div className="w-full max-w-3xl relative z-10">
+          <div className="bg-slate-800/70 p-8 rounded-3xl shadow-2xl border border-cyan-500/40 hover:shadow-cyan-400/40 transition-shadow duration-300 backdrop-blur-sm">
+            <h3 className="text-2xl md:text-3xl font-semibold mb-6 text-emerald-300">
               {quizQuestions[current].question}
             </h3>
             <div className="flex flex-col gap-4">
@@ -53,11 +56,11 @@ export default function Quiz() {
                 if (selected === idx) {
                   baseClass +=
                     idx === correctIndex
-                      ? " bg-green-500 text-white shadow-green-400/70"
-                      : " bg-red-500 text-white shadow-red-400/70";
+                      ? " bg-emerald-400 text-gray-900 shadow-lg shadow-emerald-500/40"
+                      : " bg-rose-500 text-white shadow-lg shadow-rose-400/40";
                 } else {
                   baseClass +=
-                    " bg-gray-700 text-gray-100 hover:bg-gray-600 hover:shadow-lg cursor-pointer";
+                    " bg-slate-700/80 text-gray-100 hover:bg-slate-600/80 hover:shadow-lg cursor-pointer";
                 }
 
                 return (
@@ -78,8 +81,8 @@ export default function Quiz() {
           </div>
         </div>
       ) : (
-        <div className="w-full max-w-3xl bg-gray-800 p-10 rounded-3xl shadow-2xl border border-green-500 text-center">
-          <h3 className="text-3xl md:text-4xl font-bold mb-5 text-green-300 drop-shadow-lg">
+        <div className="w-full max-w-3xl bg-slate-800/70 p-10 rounded-3xl shadow-2xl border border-cyan-500/40 text-center relative z-10 backdrop-blur-sm">
+          <h3 className="text-3xl md:text-4xl font-bold mb-5 text-cyan-300 drop-shadow-lg">
             Your Score: {score} / {quizQuestions.length}
           </h3>
 
@@ -96,7 +99,7 @@ export default function Quiz() {
               setCompleted(false);
               setSelected(null);
             }}
-            className="mt-6 bg-gradient-to-r from-green-400 to-blue-500 text-gray-900 px-6 py-3 rounded-xl shadow-lg hover:scale-105 hover:from-green-500 hover:to-blue-600 transition-transform duration-300 font-semibold"
+            className="mt-6 bg-gradient-to-r from-cyan-400 to-emerald-400 text-gray-900 px-6 py-3 rounded-xl shadow-lg hover:scale-105 hover:from-cyan-500 hover:to-emerald-500 transition-transform duration-300 font-semibold"
           >
             Retake Quiz
           </button>
