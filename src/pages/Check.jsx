@@ -35,7 +35,8 @@ export default function Check() {
         risk = "⚠️ Medium Risk!";
         level = "medium";
       }
-      advice = "Be cautious — scammers often use urgency or free prizes to trick people.";
+      advice =
+        "Be cautious — scammers often use urgency or free prizes to trick people.";
     }
 
     if (input.length > 80 && input.startsWith("http")) {
@@ -44,38 +45,41 @@ export default function Check() {
         risk = "⚠️ Medium Risk!";
         level = "medium";
       }
-      advice = "Long or messy links are often phishing attempts. Open sites only from trusted bookmarks.";
+      advice =
+        "Long or messy links are often phishing attempts. Open sites only from trusted bookmarks.";
     }
 
     setResult({ risk, level, reasons, advice });
   };
 
   const getCardStyle = (level) => {
-  switch (level) {
-    case "high":
-      return "bg-red-600 text-white border-l-8 border-red-800 shadow-2xl p-6 rounded-xl";
-    case "medium":
-      return "bg-yellow-400 text-black border-l-8 border-yellow-600 shadow-2xl p-6 rounded-xl";
-    case "safe":
-      return "bg-green-600 text-white border-l-8 border-green-800 shadow-2xl p-6 rounded-xl";
-    default:
-      return "bg-gray-300 text-black border-l-8 border-gray-500 shadow-2xl p-6 rounded-xl";
-  }
-};
-
+    switch (level) {
+      case "high":
+        return "bg-red-600/80 text-white border-l-4 border-red-800 shadow-2xl p-6 rounded-3xl";
+      case "medium":
+        return "bg-yellow-500/80 text-black border-l-4 border-yellow-700 shadow-2xl p-6 rounded-3xl";
+      case "safe":
+        return "bg-green-600/80 text-white border-l-4 border-green-800 shadow-2xl p-6 rounded-3xl";
+      default:
+        return "bg-white/10 text-white border-l-4 border-white/30 shadow-2xl p-6 rounded-3xl";
+    }
+  };
 
   return (
-    <main className="bg-gradient-to-br from-blue-900 via-purple-800 to-indigo-900 min-h-screen flex items-center px-4 py-16">
+    <main className="min-h-screen bg-slate-950 relative flex items-center justify-center px-4 py-16">
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl p-10 rounded-3xl shadow-2xl border border-white/20 w-full"
+        className="relative max-w-2xl w-full bg-white/10 backdrop-blur-xl p-10 rounded-3xl shadow-2xl border border-white/20 z-10"
       >
         <h2 className="text-4xl md:text-5xl font-extrabold mb-3 text-white">
           🔎 Scam Checker
         </h2>
-        <p className="mb-8 text-gray-200">
+        <p className="mb-8 text-indigo-200">
           Paste any suspicious message, link, or phone number. Cyber Guardian AI
           will analyze it and guide you.
         </p>
@@ -84,12 +88,12 @@ export default function Check() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Paste link or message here..."
-          className="w-full bg-white/20 border border-white/30 text-white rounded-xl p-4 mb-6 h-32 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-gray-300 transition"
+          className="w-full bg-slate-800/60 text-white border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 p-4 rounded-xl mb-6 h-32 placeholder-slate-400 transition"
         />
 
         <button
           onClick={handleCheck}
-          className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-teal-400 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition"
+          className="w-full bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition"
         >
           🚀 Check Now
         </button>
@@ -99,7 +103,7 @@ export default function Check() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className={`mt-8 border rounded-xl p-6 ${getCardStyle(result.level)}`}
+            className={`mt-8 ${getCardStyle(result.level)}`}
           >
             <h3 className="text-2xl md:text-3xl font-extrabold mb-3">
               {result.risk}
@@ -111,9 +115,7 @@ export default function Check() {
                 ))}
               </ul>
             )}
-            <p className="mt-4 font-semibold text-sm md:text-base">
-              💡 Tip:
-            </p>
+            <p className="mt-4 font-semibold text-sm md:text-base">💡 Tip:</p>
             <p className="text-sm md:text-base">{result.advice}</p>
           </motion.div>
         )}

@@ -1,34 +1,134 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Shield, Search, BookOpen, BarChart, Users, Brain, Lock } from "lucide-react";
+import {
+  Shield,
+  Search,
+  BookOpen,
+  BarChart,
+  Users,
+  Brain,
+  Lock,
+} from "lucide-react";
 
+// Navbar
 function Navbar() {
+  const navItems = [
+    { label: "Scan", path: "/check", icon: Search, color: "from-cyan-400 to-blue-400" },
+    { label: "Quiz", path: "/quiz", color: "from-purple-400 to-pink-400" },
+    { label: "Reports", path: "/reports", color: "from-green-400 to-emerald-400" },
+    { label: "Learn", path: "/learn", color: "from-yellow-400 to-orange-400" },
+  ];
+
   return (
-    <nav className="bg-white/70 backdrop-blur border-b sticky top-0 z-50 shadow-sm">
+    <nav className="fixed top-0 w-full z-50 bg-black/30 backdrop-blur-xl border-b border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.3)]">
       <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-6">
-        <h1 className="font-extrabold text-xl flex items-center gap-2 text-blue-700">
-          <Shield className="w-6 h-6" /> Cyber Guardian
-        </h1>
-        <div className="flex gap-6 text-sm font-medium">
-          <Link to="/check" className="hover:text-blue-600">Check</Link>
-          <Link to="/quiz" className="hover:text-blue-600">Quiz</Link>
-          <Link to="/reports" className="hover:text-blue-600">Reports</Link>
-          <Link to="/learn" className="hover:text-blue-600">Learn</Link>
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3">
+          <Shield className="w-8 h-8 text-cyan-400 drop-shadow-[0_0_15px_rgba(0,255,255,0.7)] animate-pulse" />
+          <h1 className="font-extrabold text-2xl bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 bg-clip-text text-transparent drop-shadow-lg">
+            Cyber Guardian
+          </h1>
+        </Link>
+
+        {/* Menu Items */}
+        <div className="flex gap-4">
+          {navItems.map((item, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <Link
+                to={item.path}
+                className={`relative px-5 py-2 rounded-xl font-semibold text-white border border-white/20 bg-gradient-to-r ${item.color} bg-clip-padding flex items-center gap-2 overflow-hidden group`}
+              >
+                {item.icon && <item.icon className="w-5 h-5 text-white drop-shadow-md" />}
+                <span className="relative z-10">{item.label}</span>
+                <span className={`absolute inset-0 bg-gradient-to-r ${item.color} opacity-20 blur-md group-hover:opacity-50 transition`} />
+                <span className="absolute -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-white/50 to-cyan-400 transition-all group-hover:w-full" />
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </div>
     </nav>
   );
 }
 
+// Footer
+function Footer() {
+  const navLinks = [
+    { label: "Scan", path: "/check", icon: Search },
+    { label: "Quiz", path: "/quiz" },
+    { label: "Reports", path: "/reports" },
+    { label: "Learn", path: "/learn" },
+  ];
+
+  return (
+    <footer className="relative z-10 bg-black/50 backdrop-blur-xl border-t border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.3)] mt-24">
+      <div className="max-w-7xl mx-auto px-8 py-12 grid md:grid-cols-3 gap-8 text-gray-300">
+        {/* Logo & Tagline */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <Shield className="w-6 h-6 text-cyan-400 drop-shadow-[0_0_15px_rgba(0,255,255,0.7)] animate-pulse" />
+            <h1 className="font-extrabold text-xl bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 bg-clip-text text-transparent drop-shadow-lg">
+              Cyber Guardian
+            </h1>
+          </div>
+          <p className="text-sm max-w-xs text-gray-300">
+            Your AI-powered shield against online scams and phishing. Stay protected and informed.
+          </p>
+        </div>
+
+        {/* Quick Links */}
+        <div className="flex flex-col gap-3">
+          <h3 className="text-lg font-semibold text-white mb-2">Quick Links</h3>
+          {navLinks.map((item, i) => (
+            <Link
+              key={i}
+              to={item.path}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-white border border-cyan-400 bg-gradient-to-r from-cyan-500 to-blue-500 hover:shadow-[0_0_25px_rgba(0,255,255,0.6)] transition"
+            >
+              {item.icon && <item.icon className="w-4 h-4" />}
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Contact */}
+        <div className="flex flex-col gap-3">
+          <h3 className="text-lg font-semibold text-white mb-2">Contact</h3>
+          <p className="text-gray-300">
+            Email:{" "}
+            <a
+              href="mailto:support@cyberguardian.com"
+              className="text-cyan-400 hover:underline"
+            >
+              support@cyberguardian.com
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-cyan-500/10 text-gray-400 text-sm text-center py-4">
+        &copy; {new Date().getFullYear()} Cyber Guardian. All rights reserved.
+      </div>
+    </footer>
+  );
+}
+
+// Main App
 export default function App() {
   return (
     <>
       <Navbar />
 
-      <main className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 min-h-screen text-white">
-        
+      <main className="relative min-h-screen text-white bg-gradient-to-br from-black via-blue-950 to-black overflow-hidden">
+        {/* Animated cyber grid background */}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] animate-pulse" />
+
         {/* Hero Section */}
-        <section className="flex items-center min-h-screen">
+        <section className="flex items-center min-h-screen relative z-10">
           <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 px-8 py-24 items-center">
             <motion.div
               initial={{ opacity: 0, x: -40 }}
@@ -36,30 +136,40 @@ export default function App() {
               transition={{ duration: 0.7 }}
               className="space-y-8"
             >
-              <h2 className="text-6xl font-extrabold leading-tight drop-shadow-lg">
-                Stay <span className="bg-gradient-to-r from-yellow-300 via-pink-400 to-orange-400 bg-clip-text text-transparent">One Step Ahead</span><br />
-                of Cyber Threats
+              <h2 className="text-6xl font-extrabold leading-tight">
+                Defend Against{" "}
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 bg-clip-text text-transparent">
+                  Cyber Threats
+                </span>
               </h2>
-              <p className="text-lg text-gray-200 max-w-md">
-                Cyber Guardian is your AI-powered shield against scams, phishing, and online fraud. 
-                Protect yourself, your family, and your community today.
+              <p className="text-lg text-gray-300 max-w-md">
+                Your AI-powered shield against scams, phishing, and digital
+                frauds. Stay protected. Stay aware. Stay ahead.
               </p>
+
+              {/* Hero Buttons */}
               <div className="flex gap-4">
                 <Link
                   to="/check"
-                  className="bg-gradient-to-r from-blue-500 to-teal-400 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:opacity-90 transition"
+                  className="relative px-6 py-3 rounded-xl font-semibold text-white overflow-hidden border border-cyan-400 group flex items-center gap-2"
                 >
-                  🚀 Start Scan
+                  <Search className="w-5 h-5" />
+                  <span className="relative z-10">🚀 Scan</span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-20 blur-md group-hover:opacity-40 transition" />
                 </Link>
                 <Link
                   to="/quiz"
-                  className="bg-white/20 border border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition"
+                  className="relative px-6 py-3 rounded-xl font-semibold text-white overflow-hidden border border-cyan-400 group flex items-center gap-2"
                 >
-                  🎮 Take Quiz
+                  <span className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-20 blur-md group-hover:opacity-40 transition" />
+                  <span className="relative z-10">🎮 Take Quiz</span>
                 </Link>
               </div>
-              <div className="flex gap-8 pt-6 text-sm text-gray-300">
-                <span className="flex items-center gap-2">✅ Trusted by 10k+ users</span>
+
+              <div className="flex gap-8 pt-6 text-sm text-gray-400">
+                <span className="flex items-center gap-2">
+                  ✅ Trusted by 10k+ users
+                </span>
                 <span className="flex items-center gap-2">🔒 Secure AI Engine</span>
               </div>
             </motion.div>
@@ -70,15 +180,15 @@ export default function App() {
               transition={{ duration: 0.7, delay: 0.3 }}
               className="relative"
             >
-              <div className="w-full h-80 bg-gradient-to-r from-indigo-700 to-purple-700 rounded-3xl shadow-2xl flex items-center justify-center">
-                <Shield className="w-32 h-32 text-white drop-shadow-2xl" />
+              <div className="w-full h-80 bg-gradient-to-br from-cyan-600 via-blue-700 to-purple-700 rounded-3xl shadow-[0_0_40px_rgba(0,255,255,0.3)] flex items-center justify-center">
+                <Shield className="w-32 h-32 text-cyan-300 drop-shadow-[0_0_15px_rgba(0,255,255,0.7)]" />
               </div>
             </motion.div>
           </div>
         </section>
 
         {/* Who We Protect */}
-        <section className="py-24 px-8 max-w-7xl mx-auto">
+        <section className="py-24 px-8 max-w-7xl mx-auto relative z-10">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -86,7 +196,7 @@ export default function App() {
             viewport={{ once: true }}
             className="text-5xl font-extrabold text-center mb-16"
           >
-            Who We <span className="text-teal-400">Protect</span>
+            Who We <span className="text-cyan-400">Protect</span>
           </motion.h2>
           <div className="grid md:grid-cols-3 gap-10">
             {[
@@ -100,9 +210,9 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: i * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-xl hover:scale-105 transition transform"
+                className="bg-white/5 backdrop-blur-xl border border-cyan-400/30 rounded-2xl p-8 shadow-lg hover:shadow-[0_0_30px_rgba(0,255,255,0.3)] hover:scale-105 transition"
               >
-                <item.icon className="w-12 h-12 mb-4 text-teal-400" />
+                <item.icon className="w-12 h-12 mb-4 text-cyan-400" />
                 <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
                 <p className="text-gray-300">{item.desc}</p>
               </motion.div>
@@ -111,7 +221,7 @@ export default function App() {
         </section>
 
         {/* Features */}
-        <section className="py-24 px-8 bg-gradient-to-br from-purple-800 via-indigo-900 to-blue-900">
+        <section className="py-24 px-8 bg-gradient-to-br from-blue-950 via-black to-blue-950 relative z-10">
           <div className="max-w-7xl mx-auto">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -120,13 +230,13 @@ export default function App() {
               viewport={{ once: true }}
               className="text-5xl font-extrabold text-center mb-16"
             >
-              Why <span className="text-yellow-400">Choose Us</span>
+              Why <span className="text-cyan-400">Choose Us</span>
             </motion.h2>
             <div className="grid md:grid-cols-3 gap-10">
               {[
-                { title: "Instant Scam Detection", desc: "AI-powered scam checker to identify threats in real time.", icon: Search },
-                { title: "Interactive Learning", desc: "Quizzes and guides to boost your cyber awareness.", icon: Brain },
-                { title: "Community Reports", desc: "Stay updated with real fraud cases from verified users.", icon: BarChart },
+                { title: "Instant Scam Detection", desc: "AI-powered checker that identifies threats in real time.", icon: Search },
+                { title: "Interactive Learning", desc: "Quizzes & guides to sharpen your cyber awareness.", icon: Brain },
+                { title: "Community Reports", desc: "Stay updated with verified real fraud cases.", icon: BarChart },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -134,9 +244,9 @@ export default function App() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: i * 0.2 }}
                   viewport={{ once: true }}
-                  className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-xl hover:scale-105 transition transform"
+                  className="bg-white/5 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-8 shadow-lg hover:shadow-[0_0_30px_rgba(138,43,226,0.5)] hover:scale-105 transition"
                 >
-                  <item.icon className="w-12 h-12 mb-4 text-yellow-400" />
+                  <item.icon className="w-12 h-12 mb-4 text-purple-400" />
                   <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
                   <p className="text-gray-300">{item.desc}</p>
                 </motion.div>
@@ -145,8 +255,8 @@ export default function App() {
           </div>
         </section>
 
-        {/* Call to Action */}
-        <section className="py-24 px-8 text-center">
+        {/* Call-to-Action */}
+        <section className="py-24 px-8 text-center relative z-10">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -154,28 +264,32 @@ export default function App() {
             viewport={{ once: true }}
             className="text-5xl font-extrabold mb-6"
           >
-            Ready to <span className="text-teal-400">Stay Safe?</span>
+            Ready to <span className="text-cyan-400">Stay Safe?</span>
           </motion.h2>
-          <p className="text-lg text-gray-200 mb-10">
-            Start scanning suspicious links or test your awareness with our interactive quiz.
+          <p className="text-lg text-gray-300 mb-10">
+            Scan suspicious links or test your awareness with our interactive quiz.
           </p>
           <div className="flex justify-center gap-6">
             <Link
               to="/check"
-              className="bg-gradient-to-r from-blue-500 to-teal-400 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:opacity-90 transition"
+              className="relative px-8 py-4 rounded-xl font-semibold text-white border border-cyan-400 group flex items-center gap-2"
             >
-              🚀 Start Scam Check
+              <Search className="w-5 h-5" />
+              <span className="relative z-10">🚀 Scan</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-20 blur-md group-hover:opacity-40 transition" />
             </Link>
             <Link
               to="/quiz"
-              className="bg-white/20 border border-white/30 px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition"
+              className="relative px-8 py-4 rounded-xl font-semibold text-white border border-cyan-400 group flex items-center gap-2"
             >
-              🎮 Take Quiz
+              <span className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-20 blur-md group-hover:opacity-40 transition" />
+              <span className="relative z-10">🎮 Take Quiz</span>
             </Link>
           </div>
         </section>
-
       </main>
+
+      <Footer />
     </>
   );
 }
