@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { quizQuestions } from "../data/quizData";
 import Badge from "../components/Badge";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function Quiz() {
   const navigate = useNavigate();
@@ -11,18 +12,38 @@ export default function Quiz() {
   const [completed, setCompleted] = useState(false);
   const [selected, setSelected] = useState(null);
 
-  const handleAnswer = (idx) => {
+  const session = useSession();
+  const supabase = useSupabaseClient();
+
+  const refreshUser = async () => {
+    const { error } = await supabase.auth.getUser();
+    if (!error) {
+      window.location.reload(); // ensures Profile count updates
+    }
+  };
+
+  const handleAnswer = async (idx) => {
     const correctIndex = quizQuestions[current].correctIndex;
     setSelected(idx);
 
     if (idx === correctIndex) setScore(score + 1);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (current + 1 < quizQuestions.length) {
         setCurrent(current + 1);
         setSelected(null);
       } else {
         setCompleted(true);
+
+        // 🔹 Increment quizzes_count in Supabase
+        if (session) {
+          const user = session.user;
+          const currentCount = user.user_metadata.quizzes_count || 0;
+          await supabase.auth.updateUser({
+            data: { quizzes_count: currentCount + 1 },
+          });
+          await refreshUser();
+        }
       }
     }, 1000);
   };

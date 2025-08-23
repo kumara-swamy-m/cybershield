@@ -7,7 +7,6 @@ import { supabase } from "../supabaseClient";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
   const menuRef = useRef(null);
 
   const [user, setUser] = useState({
@@ -28,23 +27,21 @@ export default function Profile() {
   const [form, setForm] = useState({ name: "", email: "" });
   const [avatarMenu, setAvatarMenu] = useState(false);
 
-  // Fetch current user from Supabase
   const fetchUser = async () => {
     const {
       data: { user: currentUser },
       error,
     } = await supabase.auth.getUser();
-
-    if (error) {
-      console.error("Error fetching user:", error);
-      return;
-    }
-
+    if (error) return;
     if (currentUser) {
       const avatarUrl =
         currentUser.user_metadata?.avatar_url ||
         `https://i.pravatar.cc/150?u=${currentUser.id}`;
-
+      const { data: userReports } = await supabase
+        .from("reports")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false });
       setUser((prev) => ({
         ...prev,
         id: currentUser.id,
@@ -56,6 +53,7 @@ export default function Profile() {
           quizzes: currentUser.user_metadata?.quizzes_count || 0,
           reports: currentUser.user_metadata?.reports_count || 0,
         },
+        reports: userReports || [],
       }));
       setForm({
         name: currentUser.user_metadata?.full_name || "",
@@ -68,7 +66,6 @@ export default function Profile() {
     fetchUser();
   }, []);
 
-  // Close avatar menu if clicked outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -87,19 +84,24 @@ export default function Profile() {
     const { error } = await supabase.auth.updateUser({
       data: { full_name: form.name },
     });
-
-    if (error) {
-      alert("Failed to update profile: " + error.message);
-      return;
+    if (!error) {
+      setUser({ ...user, name: form.name, email: form.email });
+      setEditMode(false);
     }
-
-    setUser({ ...user, name: form.name, email: form.email });
-    setEditMode(false);
   };
 
-  const handleDeleteReport = (index) => {
-    const updatedReports = user.reports.filter((_, i) => i !== index);
-    setUser({ ...user, reports: updatedReports });
+  const handleDeleteReport = async (id) => {
+    const { error } = await supabase.from("reports").delete().eq("id", id);
+    if (!error) {
+      setUser((prev) => ({
+        ...prev,
+        reports: prev.reports.filter((r) => r.id !== id),
+        stats: { ...prev.stats, reports: prev.stats.reports - 1 },
+      }));
+      await supabase.auth.updateUser({
+        data: { reports_count: user.stats.reports - 1 },
+      });
+    }
   };
 
   const handleSignOut = async () => {
@@ -107,64 +109,15 @@ export default function Profile() {
     navigate("/signin");
   };
 
-  // Upload avatar to Supabase Storage
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    if (!file || !user.id) return;
-
-    const fileExt = file.name.split(".").pop();
-    const filePath = `${user.id}/avatar.${fileExt}`;
-
-    let { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, file, { upsert: true });
-
-    if (uploadError) {
-      alert("Upload failed: " + uploadError.message);
-      return;
-    }
-
-    const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: { avatar_url: data.publicUrl },
-    });
-
-    if (updateError) {
-      alert("Failed to update avatar: " + updateError.message);
-      return;
-    }
-
-    setUser((prev) => ({ ...prev, avatar: data.publicUrl }));
+  const handleRandomAvatar = async () => {
+    const humanAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.id}-${Date.now()}`;
+    setUser((prev) => ({ ...prev, avatar: humanAvatar }));
+    await supabase.auth.updateUser({ data: { avatar_url: humanAvatar } });
     setAvatarMenu(false);
   };
 
-  // ✅ Increment functions
-  const incrementStat = async (statKey) => {
-    const newValue = (user.stats[statKey] || 0) + 1;
-
-    const { error } = await supabase.auth.updateUser({
-      data: { [`${statKey}_count`]: newValue },
-    });
-
-    if (!error) {
-      setUser((prev) => ({
-        ...prev,
-        stats: { ...prev.stats, [statKey]: newValue },
-      }));
-    } else {
-      console.error("Failed to update stat:", error.message);
-    }
-  };
-
-  // Call these from other parts of your app
-  const incrementScans = () => incrementStat("scans");
-  const incrementQuizzes = () => incrementStat("quizzes");
-  const incrementReports = () => incrementStat("reports");
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-blue-950 to-black text-white p-8">
-      {/* Back & Sign Out Buttons */}
       <div className="max-w-6xl mx-auto mb-6 flex justify-between items-center">
         <button
           onClick={() => navigate("/")}
@@ -181,7 +134,6 @@ export default function Profile() {
         </button>
       </div>
 
-      {/* Profile Header */}
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 md:gap-16 items-center mb-12 relative">
         <div className="flex-shrink-0 flex flex-col items-center relative" ref={menuRef}>
           <img
@@ -190,38 +142,16 @@ export default function Profile() {
             onClick={() => setAvatarMenu(!avatarMenu)}
             className="w-32 h-32 rounded-full border-4 border-cyan-400 shadow-lg object-cover cursor-pointer hover:opacity-80"
           />
-
           {avatarMenu && (
             <div className="absolute top-36 z-50 bg-gray-800 border border-cyan-400 rounded-xl shadow-lg p-2 w-44">
               <button
                 className="w-full text-left px-3 py-2 hover:bg-gray-700 rounded-lg"
-                onClick={() => fileInputRef.current.click()}
-              >
-                Upload from Device
-              </button>
-              <button
-                className="w-full text-left px-3 py-2 hover:bg-gray-700 rounded-lg"
-                onClick={() => {
-                  const humanAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.id}-${Date.now()}`;
-                  setUser((prev) => ({ ...prev, avatar: humanAvatar }));
-                  supabase.auth.updateUser({
-                    data: { avatar_url: humanAvatar },
-                  });
-                  setAvatarMenu(false);
-                }}
+                onClick={handleRandomAvatar}
               >
                 Use Random Human Avatar
               </button>
             </div>
           )}
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*"
-            className="hidden"
-          />
         </div>
 
         <div className="flex-1 space-y-3">
@@ -266,8 +196,6 @@ export default function Profile() {
               <p className="text-gray-300">{user.email}</p>
             </div>
           )}
-
-          {/* Badges */}
           <div className="flex gap-2 mt-2 flex-wrap">
             {user.badges.map((badge, i) => (
               <span
@@ -281,54 +209,41 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 mb-12">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-white/5 backdrop-blur-xl p-6 rounded-2xl flex flex-col items-center shadow-lg"
-        >
+        <motion.div whileHover={{ scale: 1.05 }} className="bg-white/5 backdrop-blur-xl p-6 rounded-2xl flex flex-col items-center shadow-lg">
           <Shield className="w-10 h-10 text-cyan-400 mb-2" />
           <h2 className="text-3xl font-bold">{user.stats.scans}</h2>
           <p className="text-gray-300 mt-1">Scans Completed</p>
         </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-white/5 backdrop-blur-xl p-6 rounded-2xl flex flex-col items-center shadow-lg"
-        >
+        <motion.div whileHover={{ scale: 1.05 }} className="bg-white/5 backdrop-blur-xl p-6 rounded-2xl flex flex-col items-center shadow-lg">
           <BookOpen className="w-10 h-10 text-purple-400 mb-2" />
           <h2 className="text-3xl font-bold">{user.stats.quizzes}</h2>
           <p className="text-gray-300 mt-1">Quizzes Taken</p>
         </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-white/5 backdrop-blur-xl p-6 rounded-2xl flex flex-col items-center shadow-lg"
-        >
+        <motion.div whileHover={{ scale: 1.05 }} className="bg-white/5 backdrop-blur-xl p-6 rounded-2xl flex flex-col items-center shadow-lg">
           <Users className="w-10 h-10 text-green-400 mb-2" />
           <h2 className="text-3xl font-bold">{user.stats.reports}</h2>
           <p className="text-gray-300 mt-1">Reports Submitted</p>
         </motion.div>
       </div>
 
-      {/* Reports */}
       <div className="max-w-6xl mx-auto mb-12">
         <h2 className="text-3xl font-extrabold mb-6">My Reports</h2>
         <div className="space-y-6">
           {user.reports.length === 0 ? (
             <p className="text-gray-400">You haven’t submitted any reports yet.</p>
           ) : (
-            user.reports.map((report, i) => (
+            user.reports.map((report) => (
               <div
-                key={i}
+                key={report.id}
                 className="p-6 rounded-2xl shadow-md border border-white/20 bg-white/10 hover:bg-white/20 transition relative"
               >
                 <button
-                  onClick={() => handleDeleteReport(i)}
+                  onClick={() => handleDeleteReport(report.id)}
                   className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition"
-                  title="Delete Report"
                 >
                   <Trash2 size={20} />
                 </button>
-
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-xl text-white">{report.title}</h3>
                   <span

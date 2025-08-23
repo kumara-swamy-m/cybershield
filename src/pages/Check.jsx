@@ -2,20 +2,42 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient"; // ✅ Import supabase
 
 export default function Check() {
-  const navigate = useNavigate(); // For navigation
+  const navigate = useNavigate();
 
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
 
-  const handleCheck = () => {
+  // ✅ Update scan count in Supabase
+  const updateScanCount = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const current = user.user_metadata?.scans_count || 0;
+      const newCount = current + 1;
+
+      // Update in Supabase
+      await supabase.auth.updateUser({
+        data: { scans_count: newCount },
+      });
+
+      // Refresh session so Profile updates instantly
+      await supabase.auth.refreshSession();
+    }
+  };
+
+  const handleCheck = async () => {
     if (!input.trim()) {
       setResult({
         risk: "⚠️ Please enter text or a link",
         level: "none",
         reasons: [],
-        advice: "Paste a suspicious message or link and I’ll scan it for you.",
+        advice:
+          "Paste a suspicious message or link and I’ll scan it for you.",
       });
       return;
     }
@@ -23,13 +45,15 @@ export default function Check() {
     const reasons = [];
     let risk = "✅ Looks Safe!";
     let level = "safe";
-    let advice = "This doesn’t look harmful, but always double-check the sender.";
+    let advice =
+      "This doesn’t look harmful, but always double-check the sender.";
 
     if (input.includes("http://")) {
       reasons.push("Uses insecure protocol (http instead of https).");
       risk = "🚨 High Risk!";
       level = "high";
-      advice = "Avoid clicking this link. Visit the official website directly.";
+      advice =
+        "Avoid clicking this link. Visit the official website directly.";
     }
 
     const keywords = ["otp", "urgent", "lottery", "prize", "password"];
@@ -54,6 +78,9 @@ export default function Check() {
     }
 
     setResult({ risk, level, reasons, advice });
+
+    // ✅ Increment scan count after each scan
+    await updateScanCount();
   };
 
   const getCardStyle = (level) => {
@@ -71,16 +98,16 @@ export default function Check() {
 
   return (
     <main className="min-h-screen bg-slate-950 relative flex flex-col items-center px-4 py-16">
- {/* Back Button */}
-<div className="self-start max-w-2xl mb-6 relative z-20">
-  <button
-    onClick={() => navigate("/")}
-    className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black font-semibold rounded-xl hover:scale-105 transition"
-  >
-    <ArrowLeft className="w-5 h-5" />
-    Back to Home
-  </button>
-</div>
+      {/* Back Button */}
+      <div className="self-start max-w-2xl mb-6 relative z-20">
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black font-semibold rounded-xl hover:scale-105 transition"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Back to Home
+        </button>
+      </div>
 
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
