@@ -8,17 +8,45 @@ import {
   Users,
   Brain,
   Lock,
-  User,
 } from "lucide-react";
+import { supabase } from "./supabaseClient";
+import { useState, useEffect } from "react";
 
 // Navbar
 function Navbar() {
+  const [session, setSession] = useState(null);
+  const [profileUrl, setProfileUrl] = useState("/default-profile.png"); // default image
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => setSession(session)
+    );
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  // Fetch profile image (optional if you still want avatar in profile page)
+  useEffect(() => {
+    if (session?.user?.id) {
+      supabase
+        .from("profiles")
+        .select("avatar_url")
+        .eq("id", session.user.id)
+        .single()
+        .then(({ data, error }) => {
+          if (!error && data?.avatar_url) setProfileUrl(data.avatar_url);
+        });
+    }
+  }, [session]);
+
   const navItems = [
     { label: "Scan", path: "/check", icon: Search, color: "from-cyan-400 to-blue-400" },
     { label: "Quiz", path: "/quiz", color: "from-purple-400 to-pink-400" },
     { label: "Reports", path: "/reports", color: "from-green-400 to-emerald-400" },
     { label: "Learn", path: "/learn", color: "from-yellow-400 to-orange-400" },
-    { label: "Profile", path: "/profile", icon: User, color: "from-pink-400 to-red-400" },
+    ...(session
+      ? [{ label: "Profile", path: "/profile", color: "from-pink-400 to-red-400" }]
+      : []),
   ];
 
   return (
@@ -33,7 +61,7 @@ function Navbar() {
         </Link>
 
         {/* Menu Items */}
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
           {navItems.map((item, i) => (
             <motion.div
               key={i}
@@ -46,11 +74,23 @@ function Navbar() {
               >
                 {item.icon && <item.icon className="w-5 h-5 text-white drop-shadow-md" />}
                 <span className="relative z-10">{item.label}</span>
-                <span className={`absolute inset-0 bg-gradient-to-r ${item.color} opacity-20 blur-md group-hover:opacity-50 transition`} />
+                <span
+                  className={`absolute inset-0 bg-gradient-to-r ${item.color} opacity-20 blur-md group-hover:opacity-50 transition`}
+                />
                 <span className="absolute -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-white/50 to-cyan-400 transition-all group-hover:w-full" />
               </Link>
             </motion.div>
           ))}
+
+          {/* Show Sign In if not logged in */}
+          {!session && (
+            <Link
+              to="/signin"
+              className="px-4 py-2 bg-cyan-400 text-black font-semibold rounded-xl hover:scale-105 transition"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </nav>
@@ -64,7 +104,6 @@ function Footer() {
     { label: "Quiz", path: "/quiz" },
     { label: "Reports", path: "/reports" },
     { label: "Learn", path: "/learn" },
-    { label: "Profile", path: "/profile", icon: User },
   ];
 
   return (
@@ -170,7 +209,9 @@ export default function App() {
               </div>
 
               <div className="flex gap-8 pt-6 text-sm text-gray-400">
-                <span className="flex items-center gap-2">✅ Trusted by 10k+ users</span>
+                <span className="flex items-center gap-2">
+                  ✅ Trusted by 10k+ users
+                </span>
                 <span className="flex items-center gap-2">🔒 Secure AI Engine</span>
               </div>
             </motion.div>
@@ -188,7 +229,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* Who We Protect */}
+        {/* Who We Protect Section */}
         <section className="py-24 px-8 max-w-7xl mx-auto relative z-10">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}

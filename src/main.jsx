@@ -8,10 +8,9 @@ import Quiz from "./pages/Quiz.jsx";
 import Reports from "./pages/Reports.jsx";
 import Learn from "./pages/Learn.jsx";
 import Profile from "./pages/profile.jsx";
-
-
-
-
+import SignUp from "./auth/SignUp";
+import SignIn from "./auth/SignIn";
+import SignOutButton from "./auth/SignOutButton";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -24,6 +23,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/learn" element={<Learn />} />
         <Route path="/profile" element={<Profile />} />
 
+        {/* Auth routes */}
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signin" element={<SignIn />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
