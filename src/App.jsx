@@ -8,6 +8,7 @@ import {
   Users,
   Brain,
   Lock,
+  User,
 } from "lucide-react";
 
 // Navbar
@@ -17,6 +18,7 @@ function Navbar() {
     { label: "Quiz", path: "/quiz", color: "from-purple-400 to-pink-400" },
     { label: "Reports", path: "/reports", color: "from-green-400 to-emerald-400" },
     { label: "Learn", path: "/learn", color: "from-yellow-400 to-orange-400" },
+    { label: "Profile", path: "/profile", icon: User, color: "from-pink-400 to-red-400" },
   ];
 
   return (
@@ -62,6 +64,7 @@ function Footer() {
     { label: "Quiz", path: "/quiz" },
     { label: "Reports", path: "/reports" },
     { label: "Learn", path: "/learn" },
+    { label: "Profile", path: "/profile", icon: User },
   ];
 
   return (
@@ -167,9 +170,7 @@ export default function App() {
               </div>
 
               <div className="flex gap-8 pt-6 text-sm text-gray-400">
-                <span className="flex items-center gap-2">
-                  ✅ Trusted by 10k+ users
-                </span>
+                <span className="flex items-center gap-2">✅ Trusted by 10k+ users</span>
                 <span className="flex items-center gap-2">🔒 Secure AI Engine</span>
               </div>
             </motion.div>
@@ -220,7 +221,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* Features */}
+        {/* Features Section */}
         <section className="py-24 px-8 bg-gradient-to-br from-blue-950 via-black to-blue-950 relative z-10">
           <div className="max-w-7xl mx-auto">
             <motion.h2

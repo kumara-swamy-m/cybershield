@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Check() {
+  const navigate = useNavigate(); // For navigation
+
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
 
@@ -66,7 +70,18 @@ export default function Check() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 relative flex items-center justify-center px-4 py-16">
+    <main className="min-h-screen bg-slate-950 relative flex flex-col items-center px-4 py-16">
+ {/* Back Button */}
+<div className="self-start max-w-2xl mb-6 relative z-20">
+  <button
+    onClick={() => navigate("/")}
+    className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black font-semibold rounded-xl hover:scale-105 transition"
+  >
+    <ArrowLeft className="w-5 h-5" />
+    Back to Home
+  </button>
+</div>
+
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 

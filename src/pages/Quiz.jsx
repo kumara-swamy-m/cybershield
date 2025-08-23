@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { quizQuestions } from "../data/quizData";
 import Badge from "../components/Badge";
 
 export default function Quiz() {
+  const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [completed, setCompleted] = useState(false);
@@ -34,8 +37,17 @@ export default function Quiz() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex flex-col items-center py-10 px-4 relative overflow-hidden">
-      {/* subtle animated background grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] animate-[pulse_6s_ease-in-out_infinite]"></div>
+      {/* Back Button */}
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-6 left-6 flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black font-semibold rounded-xl hover:scale-105 transition z-20"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        Back
+      </button>
+
+      {/* Subtle animated background grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] animate-[pulse_6s_ease-in-out_infinite] pointer-events-none"></div>
 
       <h2 className="text-4xl md:text-5xl font-extrabold mb-10 text-center text-cyan-300 drop-shadow-lg relative z-10">
         🕹 Gamified Cyber Quiz

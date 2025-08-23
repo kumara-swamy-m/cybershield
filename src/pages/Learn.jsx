@@ -2,14 +2,25 @@
 import { useState } from "react";
 import { tipsData } from "../utils/tips";
 import { generateChecklistPDF } from "../utils/pdf";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Learn() {
   const [selected, setSelected] = useState(null);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 relative overflow-hidden text-white">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-6 left-6 flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black font-semibold rounded-xl hover:scale-105 transition z-20"
+      >
+        <ArrowLeft size={20} /> Back
+      </button>
+
       {/* Subtle animated background grid (same as Quiz) */}
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] animate-[pulse_6s_ease-in-out_infinite]"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] animate-[pulse_6s_ease-in-out_infinite] pointer-events-none"></div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
         {/* Title */}
@@ -60,7 +71,7 @@ export default function Learn() {
         ) : (
           // STEP 2: Show tips + checklist
           <div className="space-y-10">
-            {/* Back button */}
+            {/* Back button to categories */}
             <button
               onClick={() => setSelected(null)}
               className="px-5 py-2 border border-cyan-400 text-cyan-300 rounded-lg hover:bg-cyan-600/20 transition"

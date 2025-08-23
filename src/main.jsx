@@ -7,6 +7,11 @@ import Check from "./pages/Check.jsx";
 import Quiz from "./pages/Quiz.jsx";
 import Reports from "./pages/Reports.jsx";
 import Learn from "./pages/Learn.jsx";
+import Profile from "./pages/profile.jsx";
+
+
+
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -17,6 +22,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/quiz" element={<Quiz />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/learn" element={<Learn />} />
+        <Route path="/profile" element={<Profile />} />
+
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
