@@ -43,10 +43,8 @@ src/
 ```bash
 git clone https://github.com/your-username/cyber-platform.git
 cd cyber-platform
-
 2️⃣ Install Dependencies
 npm install
-
 3️⃣ Configure Supabase
 
 Go to Supabase
@@ -57,15 +55,17 @@ Create a new project.
 Copy your API URL and Anon Key.
 
 Create a file src/supabaseClient.js:
+
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = "https://YOUR-PROJECT.supabase.co";
 const supabaseKey = "YOUR-ANON-KEY";
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
+
 4️⃣ Database Setup
 
-In Supabase SQL Editor, run:
+Run this in the Supabase SQL Editor:
 
 -- Table: reports
 create table reports (
@@ -110,8 +110,6 @@ Reports → Add, view, or delete reports (counts auto-update).
 
 Quiz → Answer cyber security questions & earn badges.
 
-
-
 💡 Tech Stack
 
 Frontend: React + Vite + TailwindCSS + Framer Motion
@@ -120,16 +118,27 @@ Backend: Supabase (Auth, Database, Storage)
 
 Icons: Lucide React
 
+🌍 Deployment
+
+The app is live here:
+👉 CyberShield on Vercel
+
 🤝 Contributing
 
 Pull requests are welcome! If you’d like to contribute:
 
 Fork the repo.
 
-Create your feature branch (git checkout -b feature/new-feature).
+Create your feature branch:
 
-Commit your changes (git commit -m 'Add new feature').
+git checkout -b feature/new-feature
 
-Push to the branch (git push origin feature/new-feature).
 
-Open a Pull Request.
+Commit your changes:
+
+git commit -m 'Add new feature'
+
+
+Push to the branch:
+
+git push origin feature/new-feature
