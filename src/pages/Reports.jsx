@@ -1,119 +1,318 @@
-// src/pages/Learn.jsx
-import { useState } from "react";
-import { tipsData } from "../utils/tips";
-import { generateChecklistPDF } from "../utils/pdf";
+import { useState, useMemo } from "react";
+import { Shield, Globe2, Trash2 } from "lucide-react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from "recharts";
 
-export default function Learn() {
-  const [selected, setSelected] = useState(null);
+export default function Reports() {
+  const [reports, setReports] = useState([
+    {
+      name: "Rahul Mehta",
+      email: "rahul@example.com",
+      title: "Fake UPI SMS",
+      city: "Bangalore",
+      description: "Got a fake Paytm message asking to click on a link.",
+      type: "UPI Fraud",
+    },
+    {
+      name: "Aditi Sharma",
+      email: "aditi@example.com",
+      title: "Lottery Email",
+      city: "Delhi",
+      description: "Email said I won ₹5 lakh lottery. Clearly a scam.",
+      type: "Phishing",
+    },
+    {
+      name: "Rohit Singh",
+      email: "rohit@example.com",
+      title: "Fake Call from Bank",
+      city: "Mumbai",
+      description: "Caller pretending to be from SBI asked OTP.",
+      type: "Fake Call",
+    },
+  ]);
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    title: "",
+    city: "",
+    description: "",
+    type: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (
+      !form.name ||
+      !form.email ||
+      !form.title ||
+      !form.city ||
+      !form.description ||
+      !form.type
+    )
+      return;
+
+    setReports([{ ...form }, ...reports]);
+    setForm({
+      name: "",
+      email: "",
+      title: "",
+      city: "",
+      description: "",
+      type: "",
+    });
+  };
+
+  const handleDelete = (index) => {
+    setReports(reports.filter((_, i) => i !== index));
+  };
+
+  // --- Analytics Data ---
+  const typeData = useMemo(() => {
+    const counts = {};
+    reports.forEach((r) => {
+      counts[r.type] = (counts[r.type] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }, [reports]);
+
+  const cityData = useMemo(() => {
+    const counts = {};
+    reports.forEach((r) => {
+      counts[r.city] = (counts[r.city] || 0) + 1;
+    });
+    return Object.entries(counts).map(([city, reports]) => ({
+      city,
+      reports,
+    }));
+  }, [reports]);
+
+  const COLORS = ["#60a5fa", "#fbbf24", "#f87171", "#34d399", "#c084fc"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 relative overflow-hidden text-white">
-      {/* Subtle animated background grid (same as Quiz) */}
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] animate-[pulse_6s_ease-in-out_infinite]"></div>
+    <div className="min-h-screen bg-slate-950 text-white relative">
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
-        {/* Title */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-cyan-300 drop-shadow-lg">
-            🔒 Cyber Safety Learn Hub
+      {/* Hero Header */}
+      <div className="relative bg-gradient-to-r from-blue-700 via-indigo-800 to-purple-800 text-white py-16 px-6 rounded-b-3xl shadow-lg">
+        <div className="max-w-3xl mx-auto text-center">
+          <Shield className="mx-auto mb-5" size={56} />
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
+            Community Scam Reports
           </h1>
-          <p className="mt-3 text-gray-400 text-lg">
-            Tailored safety tips for everyone
+          <p className="text-indigo-200 text-lg leading-relaxed">
+            Stay ahead of fraudsters. Explore scam trends & submit your
+            experience to protect others.
           </p>
         </div>
+      </div>
 
-        {!selected ? (
-          // STEP 1: User category selection
-          <div>
-            <h2 className="text-center text-2xl font-bold mb-10 text-emerald-300">
-              Choose your category
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { type: "student", title: "Students", emoji: "🎓" },
-                { type: "homemaker", title: "Homemakers", emoji: "🏠" },
-                { type: "senior", title: "Senior Citizens", emoji: "👴" },
-              ].map((item) => (
-                <button
-                  key={item.type}
-                  onClick={() => setSelected(item.type)}
-                  className="relative p-10 rounded-2xl bg-slate-800/70 border border-cyan-500/40 backdrop-blur-sm shadow-xl hover:shadow-cyan-400/30 hover:-translate-y-2 transition-all"
-                >
-                  {/* Glow behind icon */}
-                  <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
-                    <div className="w-24 h-24 rounded-full bg-cyan-500/10 blur-2xl"></div>
-                  </div>
-
-                  <div className="flex flex-col items-center relative z-10">
-                    <span className="text-7xl drop-shadow-md">{item.emoji}</span>
-                    <h3 className="text-2xl font-bold text-cyan-300 mt-4">
-                      {item.title}
-                    </h3>
-                    <p className="text-sm text-gray-400 mt-2">
-                      Explore safety tips
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          // STEP 2: Show tips + checklist
-          <div className="space-y-10">
-            {/* Back button */}
-            <button
-              onClick={() => setSelected(null)}
-              className="px-5 py-2 border border-cyan-400 text-cyan-300 rounded-lg hover:bg-cyan-600/20 transition"
-            >
-              ← Back to categories
-            </button>
-
-            {/* Tips */}
-            <div>
-              <h2 className="text-3xl font-bold mb-6 capitalize text-emerald-300 drop-shadow-md">
-                {selected} Safety Tips
-              </h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                {tipsData[selected].map((tip, idx) => (
-                  <div
-                    key={idx}
-                    className="p-6 rounded-2xl bg-slate-800/70 border border-cyan-500/40 shadow-lg backdrop-blur-sm hover:shadow-cyan-400/30 transition"
-                  >
-                    <div className="flex items-start gap-4">
-                      <span className="text-3xl">{tip.icon}</span>
-                      <div>
-                        <h3 className="font-semibold text-lg text-cyan-300">
-                          {tip.title}
-                        </h3>
-                        <p className="text-sm text-gray-300">{tip.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Checklist */}
-            <div className="p-6 rounded-2xl bg-slate-800/70 border border-cyan-500/40 shadow-lg backdrop-blur-sm">
-              <h3 className="text-xl font-bold mb-4 text-emerald-300 drop-shadow-md">
-                Cyber Safety Checklist ✅
-              </h3>
-              <ul className="list-disc pl-5 space-y-1 text-gray-300 text-sm">
-                <li>Never share OTPs or PINs</li>
-                <li>Always check website URL (https://)</li>
-                <li>Don’t click unknown links</li>
-                <li>Enable 2FA for important accounts</li>
-                <li>Update your passwords regularly</li>
-              </ul>
-              <button
-                onClick={() => generateChecklistPDF(selected)}
-                className="mt-6 bg-gradient-to-r from-cyan-400 to-emerald-400 text-gray-900 px-6 py-3 rounded-xl shadow-lg hover:scale-105 hover:from-cyan-500 hover:to-emerald-500 transition-transform duration-300 font-semibold"
+      {/* Dashboard */}
+      <div className="relative max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 gap-10">
+        {/* Scam Types Pie */}
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-6 rounded-3xl shadow-2xl">
+          <h3 className="text-xl font-semibold text-indigo-100 mb-4">
+            Scam Types Distribution
+          </h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie
+                data={typeData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={90}
+                label
               >
-                Download {selected.charAt(0).toUpperCase() + selected.slice(1)} PDF
-              </button>
+                {typeData.map((_, index) => (
+                  <Cell
+                    key={index}
+                    fill={COLORS[index % COLORS.length]}
+                    stroke="white"
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  background:
+                    "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                  borderRadius: "12px",
+                  border: "1px solid #334155",
+                  color: "#fff",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+                  padding: "10px 14px",
+                }}
+                itemStyle={{
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: "#e2e8f0",
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* City Bar Chart */}
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-6 rounded-3xl shadow-2xl">
+          <h3 className="text-xl font-semibold text-indigo-100 mb-4">
+            Top Cities Affected
+          </h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={cityData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+              <XAxis dataKey="city" stroke="#cbd5e1" />
+              <YAxis stroke="#cbd5e1" />
+              <Tooltip
+                contentStyle={{
+                  background: "#1e293b",
+                  borderRadius: "10px",
+                  border: "1px solid #334155",
+                  color: "#fff",
+                }}
+              />
+              <Bar dataKey="reports" fill="#60a5fa" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Report Form */}
+      <div className="relative max-w-4xl mx-auto px-6">
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-8 rounded-3xl mb-12 shadow-2xl">
+          <h3 className="text-2xl font-bold mb-6 flex items-center gap-2 text-indigo-100">
+            <Globe2 className="text-blue-400" /> Submit a Scam Report
+          </h3>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                value={form.name}
+                onChange={handleChange}
+                className="w-full bg-slate-800/60 text-white border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 p-3 rounded-xl placeholder-slate-400"
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email"
+                value={form.email}
+                onChange={handleChange}
+                className="w-full bg-slate-800/60 text-white border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 p-3 rounded-xl placeholder-slate-400"
+              />
             </div>
-          </div>
-        )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="title"
+                placeholder="Title (e.g. Fake SMS)"
+                value={form.title}
+                onChange={handleChange}
+                className="w-full bg-slate-800/60 text-white border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 p-3 rounded-xl placeholder-slate-400"
+              />
+              <input
+                type="text"
+                name="city"
+                placeholder="City"
+                value={form.city}
+                onChange={handleChange}
+                className="w-full bg-slate-800/60 text-white border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 p-3 rounded-xl placeholder-slate-400"
+              />
+            </div>
+
+            <select
+              name="type"
+              value={form.type}
+              onChange={handleChange}
+              className="w-full bg-slate-800/60 text-white border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 p-3 rounded-xl"
+            >
+              <option value="">Select Scam Type</option>
+              <option value="Phishing">🎣 Phishing</option>
+              <option value="UPI Fraud">💰 UPI Fraud</option>
+              <option value="Fake Call">📞 Fake Call</option>
+              <option value="Lottery">🎟️ Lottery Scam</option>
+            </select>
+
+            <textarea
+              name="description"
+              placeholder="Describe the scam..."
+              value={form.description}
+              onChange={handleChange}
+              className="w-full bg-slate-800/60 text-white border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 p-3 rounded-xl placeholder-slate-400"
+              rows={4}
+            />
+
+            <button
+              type="submit"
+              className="w-full md:w-auto bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 hover:opacity-90 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition"
+            >
+              🚀 Submit Report
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Reports Feed */}
+      <div className="relative max-w-4xl mx-auto px-6 pb-16">
+        <h3 className="text-2xl font-bold mb-6 text-indigo-100">
+          📌 Latest Reports
+        </h3>
+        <div className="space-y-6">
+          {reports.map((r, idx) => (
+            <div
+              key={idx}
+              className="p-6 rounded-3xl shadow-md border border-white/20 bg-white/10 hover:bg-white/20 transition relative"
+            >
+              {/* Delete bin button */}
+              <button
+                onClick={() => handleDelete(idx)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition"
+                title="Delete Report"
+              >
+                <Trash2 size={20} />
+              </button>
+
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-bold text-xl text-white">{r.title}</h3>
+                <span
+                  className={`px-3 py-1 text-sm rounded-full font-medium ${
+                    r.type === "Phishing"
+                      ? "bg-red-500/20 text-red-300"
+                      : r.type === "UPI Fraud"
+                      ? "bg-yellow-500/20 text-yellow-300"
+                      : r.type === "Fake Call"
+                      ? "bg-emerald-500/20 text-emerald-300"
+                      : "bg-blue-500/20 text-blue-300"
+                  }`}
+                >
+                  {r.type}
+                </span>
+              </div>
+              <p className="text-sm text-indigo-200 mb-2">
+                👤 {r.name} | 📧 {r.email} | 📍 {r.city}
+              </p>
+              <p className="text-slate-200 leading-relaxed">{r.description}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
