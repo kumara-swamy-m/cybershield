@@ -146,7 +146,7 @@ function Footer() {
               href="mailto:support@cyberguardian.com"
               className="text-cyan-400 hover:underline"
             >
-              support@cyberguardian.com
+              kumaramswamy7147@gmail.com
             </a>
           </p>
         </div>
