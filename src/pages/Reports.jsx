@@ -100,7 +100,7 @@ export default function Reports() {
           data: { reports_count: currentCount + 1 },
         });
 
-        await refreshUser();
+    
       }
     }
   };
